@@ -1,12 +1,7 @@
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  Polyline,
-  useMap,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import markerIconPng from "leaflet/dist/images/marker-icon.png";
+import { Icon } from "leaflet";
 import ArrowheadsPolyline from "./ArrowheadPolyLine";
 
 function SetBound({ bound }) {
@@ -40,7 +35,17 @@ export default function Map({ flightPath }) {
 
       {boundArr.length >= 2
         ? boundArr.map((position, i) => (
-            <Marker position={position} key={fixNameArr[i]}>
+            <Marker
+              position={position}
+              key={fixNameArr[i]}
+              icon={
+                new Icon({
+                  iconUrl: markerIconPng,
+                  iconSize: [25, 41],
+                  iconAnchor: [12, 41],
+                })
+              }
+            >
               <Popup>Fix: {fixNameArr[i]}</Popup>
             </Marker>
           ))
