@@ -1,0 +1,53 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Login to DockerHub
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+    - name: Build the Docker image
+      run: docker build --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} --file Dockerfile --tag cerushady/flight_viewer_frontend .
+
+    - name: Push to DockerHub
+      run: docker push cerushady/flight_viewer_frontend:latest
+
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Login to DockerHub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    
+      - name: Pull latest from DockerHub
+        run: docker pull cerushady/flight_viewer_frontend:latest
+
+      - name: Delete existing container
+        run: |
+          if [ "$(docker ps -q -f name=flight_viewer_frontend_cont)" ]; then
+            sudo docker rm -f flight_viewer_frontend_cont
+          fi
+
+      - name: Run container   
+        run: docker run -d -p 3000:3000 --name flight_viewer_frontend_cont cerushady/flight_viewer_frontend
