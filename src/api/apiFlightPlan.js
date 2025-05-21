@@ -7,10 +7,10 @@ export async function getFlightList(searchTerm, page) {
   request = request.concat(`page=${page}`);
 
   try {
-    const response = await axios(request);
+    const response = await axios.get(request);
     return response.data;
   } catch (err) {
-    throw new Error(` Unable to get flight list due to ${err.message}`);
+    throw new Error(`Error: ${err.response.data.message}`);
   }
 }
 
@@ -18,9 +18,10 @@ export async function getFlightPlan(id) {
   let request = API_URL + "/plan/" + id;
 
   try {
-    const response = await axios(request);
+    const response = await axios.get(request);
+
     return response.data;
   } catch (err) {
-    throw new Error(` Unable to get flight plan due to ${err.message}`);
+    throw new Error(`Error: ${err.response.data.message}`);
   }
 }
