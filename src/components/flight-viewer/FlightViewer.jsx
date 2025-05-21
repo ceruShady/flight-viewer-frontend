@@ -27,8 +27,9 @@ export default function FlightViewer() {
   }
 
   function handleGetFlightPlan(id) {
-    // console.log("Retrieving flight plan for id: " + id);
-    getFlightPlan(id).then((response) => setFlightPath(response));
+    getFlightPlan(id)
+      .then((response) => setFlightPath(response))
+      .catch((err) => alert(err.message));
   }
 
   function handleSetPage(page) {
@@ -38,7 +39,13 @@ export default function FlightViewer() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setFlightList(await getFlightList(searchTerm, page));
+      try {
+        const newFlightList = await getFlightList(searchTerm, page);
+        setFlightList(newFlightList);
+      } catch (err) {
+        alert(err.message);
+      }
+
       setIsLoading(false);
     };
 
